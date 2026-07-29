@@ -162,6 +162,34 @@ static inline void draw_pixel_raw(uint32_t* buf, int win_w, int win_h, int px, i
     buf[py * win_w + px] = color | 0xFF000000;
 }
 
+static inline void blend_pixel_raw(uint32_t* buf, int win_w, int win_h, int px, int py, uint32_t color, unsigned char alpha) {
+    if (alpha == 0) return;
+    if (px < 0 || px >= win_w || py < 0 || py >= win_h) return;
+    if (g_clip_stack) {
+        if (px < g_clip_stack->x || px >= g_clip_stack->x + g_clip_stack->w ||
+            py < g_clip_stack->y || py >= g_clip_stack->y + g_clip_stack->h)
+            return;
+    }
+    if (alpha == 255) {
+        buf[py * win_w + px] = color | 0xFF000000;
+        return;
+    }
+    uint32_t bg = buf[py * win_w + px];
+    uint8_t fg_r = (color >> 16) & 0xFF;
+    uint8_t fg_g = (color >> 8) & 0xFF;
+    uint8_t fg_b = color & 0xFF;
+
+    uint8_t bg_r = (bg >> 16) & 0xFF;
+    uint8_t bg_g = (bg >> 8) & 0xFF;
+    uint8_t bg_b = bg & 0xFF;
+
+    uint8_t out_r = ((fg_r * alpha) + (bg_r * (255 - alpha))) / 255;
+    uint8_t out_g = ((fg_g * alpha) + (bg_g * (255 - alpha))) / 255;
+    uint8_t out_b = ((fg_b * alpha) + (bg_b * (255 - alpha))) / 255;
+
+    buf[py * win_w + px] = (0xFFU << 24) | ((uint32_t)out_r << 16) | ((uint32_t)out_g << 8) | out_b;
+}
+
 void fl_rectf(int x, int y, int w, int h, Fl_Color c) {
     Fl_Window* win = Fl::first_window();
     if (!win || !win->buffer()) return;
@@ -274,15 +302,7 @@ void fl_draw(const char* str, int n, int x, int y) {
                         if (alpha > 0) {
                             int px = cur_x + c_x1 + col;
                             int py = cur_y + baseline + c_y1 + row;
-                            if (alpha == 255) {
-                                draw_pixel_raw(buf, win_w, win_h, px, py, color_argb);
-                            } else {
-                                unsigned char r = (real_color >> 16) & 0xFF;
-                                unsigned char g = (real_color >> 8) & 0xFF;
-                                unsigned char b = real_color & 0xFF;
-                                uint32_t blended = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
-                                draw_pixel_raw(buf, win_w, win_h, px, py, blended);
-                            }
+                            blend_pixel_raw(buf, win_w, win_h, px, py, real_color, alpha);
                         }
                     }
                 }
@@ -321,8 +341,9 @@ void fl_draw_image(const unsigned char* buf_data, int X, int Y, int W, int H, in
             unsigned char red = row_ptr[col * D];
             unsigned char green = row_ptr[col * D + 1];
             unsigned char blue = row_ptr[col * D + 2];
+            unsigned char alpha = (D >= 4) ? row_ptr[col * D + 3] : 255;
             uint32_t argb = ((uint32_t)red << 16) | ((uint32_t)green << 8) | (uint32_t)blue;
-            draw_pixel_raw(win_buf, win_w, win_h, X + col, Y + r, argb);
+            blend_pixel_raw(win_buf, win_w, win_h, X + col, Y + r, argb, alpha);
         }
     }
 }
