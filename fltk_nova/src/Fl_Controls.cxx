@@ -261,14 +261,27 @@ void Fl_Pixmap::draw(int X, int Y, int W, int H, int, int) const {
                     while ((cptr[hexlen] >= '0' && cptr[hexlen] <= '9') ||
                            (cptr[hexlen] >= 'a' && cptr[hexlen] <= 'f') ||
                            (cptr[hexlen] >= 'A' && cptr[hexlen] <= 'F')) hexlen++;
+                    auto hex_val = [](char c) -> unsigned int {
+                        if (c >= '0' && c <= '9') return c - '0';
+                        if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+                        if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+                        return 0;
+                    };
+                    auto hex_byte = [&](const char* p) -> unsigned int {
+                        return (hex_val(p[0]) << 4) | hex_val(p[1]);
+                    };
                     if (hexlen == 12) {
-                        sscanf(cptr, "%02x%*02x%02x%*02x%02x", &r, &g, &b);
+                        r = hex_byte(cptr);
+                        g = hex_byte(cptr + 4);
+                        b = hex_byte(cptr + 8);
                     } else if (hexlen == 6) {
-                        sscanf(cptr, "%02x%02x%02x", &r, &g, &b);
+                        r = hex_byte(cptr);
+                        g = hex_byte(cptr + 2);
+                        b = hex_byte(cptr + 4);
                     } else if (hexlen == 3) {
-                        unsigned int r1 = 0, g1 = 0, b1 = 0;
-                        sscanf(cptr, "%1x%1x%1x", &r1, &g1, &b1);
-                        r = r1 * 17; g = g1 * 17; b = b1 * 17;
+                        r = hex_val(cptr[0]) * 17;
+                        g = hex_val(cptr[1]) * 17;
+                        b = hex_val(cptr[2]) * 17;
                     }
                 } else {
                     if (strncasecmp(cptr, "red", 3) == 0) { r = 255; g = 0; b = 0; }
