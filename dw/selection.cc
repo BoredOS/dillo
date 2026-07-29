@@ -27,9 +27,7 @@
 
 using namespace lout;
 
-/*
- * strndup() is a GNU extension.
- */
+#ifndef HAVE_STRNDUP
 extern "C" char *strndup(const char *s, size_t size)
 {
    char *r = (char *) malloc (size + 1);
@@ -41,6 +39,7 @@ extern "C" char *strndup(const char *s, size_t size)
 
    return r;
 }
+#endif
 
 namespace dw {
 namespace core {

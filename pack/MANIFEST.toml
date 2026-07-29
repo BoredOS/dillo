@@ -1,0 +1,11 @@
+[package]
+name = "dillo"
+version = "3.3.0"
+description = "Fast and lightweight web browser for Nova & BoredOS with BearSSL HTTPS support"
+author = "BoredOS Team"
+
+[binaries]
+dillo = "bin/dillo.elf"
+
+[desktop]
+entry = "Library/AppData/org.boredos.nova/dillo.desktop"

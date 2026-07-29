@@ -189,13 +189,11 @@ void FltkViewport::hscrollbarCallback (Fl_Widget *hscrollbar,void *viewportPtr)
 
 void FltkViewport::resize(int X, int Y, int W, int H)
 {
-   bool dimension_changed = W != w() || H != h();
-
    Fl_Group::resize(X, Y, W, H);
-   if (dimension_changed) {
+   if (theLayout) {
       theLayout->viewportSizeChanged (this, W, H);
-      adjustScrollbarsAndGadgetsAllocation ();
    }
+   adjustScrollbarsAndGadgetsAllocation ();
 }
 
 void FltkViewport::draw_area (void *data, int x, int y, int w, int h)

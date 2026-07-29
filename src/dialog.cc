@@ -20,12 +20,13 @@
 #include <errno.h>
 
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Box.H>
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Secret_Input.H>

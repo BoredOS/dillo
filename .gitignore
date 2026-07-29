@@ -49,3 +49,6 @@ tags
 /test/shapes
 /test/trie
 /test/unicode-test
+obj/
+*DS_Store 
+*.elf

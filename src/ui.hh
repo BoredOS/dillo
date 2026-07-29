@@ -54,6 +54,11 @@ public:
   CustGroupHorizontal(int x,int y,int w ,int h,const char *l = 0) :
     Fl_Group(x,y,w,h,l) { };
 
+  virtual void resize(int X, int Y, int W, int H) override {
+     Fl_Group::resize(X, Y, W, H);
+     rearrange();
+  }
+
   void rearrange() {
      Fl_Widget*const* a = array();
      int sum = 0, _x = x();
@@ -92,6 +97,11 @@ class CustGroupVertical : public Fl_Group {
 public:
   CustGroupVertical(int x,int y,int w ,int h,const char *l = 0) :
     Fl_Group(x,y,w,h,l) { };
+
+  virtual void resize(int X, int Y, int W, int H) override {
+     Fl_Group::resize(X, Y, W, H);
+     rearrange();
+  }
 
   void rearrange() {
      Fl_Widget*const* a = array();
